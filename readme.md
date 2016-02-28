@@ -5,6 +5,8 @@
 This project is based on the project here http://www.mathworks.com/matlabcentral/fileexchange/54076-mlp-neural-network-with-backpropagation .
 I just trans it into GPU version.
 
+![preview](/Final Result for 2 Spirals.png)
+
 ## Requirement ##
 
 * Matlab
