@@ -4,9 +4,11 @@
 
 %% Clear Variables, Close Current Figures, and Create Results Directory 
 clc;
-clear all;
+clear;
 close all;
 mkdir('Results//'); %Directory for Storing Results
+
+gpuDevice(1) %select the GPU device
 
 %% Configurations/Parameters
 dataFileName = 'sharky.spirals.points'; %sharky.linear.points - sharky.circle.points - sharky.wave.points - sharky.spirals.points
@@ -66,10 +68,10 @@ Weights = cell(1, nbrOfLayers); %Weights connecting bias nodes with previous lay
 Delta_Weights = cell(1, nbrOfLayers);
 ResilientDeltas = Delta_Weights; % Needed in case that Resilient Gradient Descent is used
 for i = 1:length(Weights)-1
-    Weights{i} = 2*rand(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1))-1; %RowIndex: From Node Number, ColumnIndex: To Node Number
+    Weights{i} = gpuArray(2*rand(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1))-1); %RowIndex: From Node Number, ColumnIndex: To Node Number
     Weights{i}(:,1) = 0; %Bias nodes weights with previous layer (Redundant step)
-    Delta_Weights{i} = zeros(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1));
-    ResilientDeltas{i} = deltas_start*ones(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1));
+    Delta_Weights{i} = gpuArray(zeros(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1)));
+    ResilientDeltas{i} = gpuArray(deltas_start*ones(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1)));
 end
 Weights{end} = ones(nbrOfNodesPerLayer(end), 1); %Virtual Weights for Output Nodes
 Old_Delta_Weights_for_Momentum = Delta_Weights;
@@ -77,7 +79,7 @@ Old_Delta_Weights_for_Resilient = Delta_Weights;
 
 NodesActivations = cell(1, nbrOfLayers);
 for i = 1:length(NodesActivations)
-    NodesActivations{i} = zeros(1, nbrOfNodesPerLayer(i));
+    NodesActivations{i} = gpuArray(zeros(1, nbrOfNodesPerLayer(i)));
 end
 NodesBackPropagatedErrors = NodesActivations; %Needed for Backpropagation Training Backward Pass
 
